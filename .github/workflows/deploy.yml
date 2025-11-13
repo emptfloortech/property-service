@@ -1,0 +1,52 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout your repo
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      # Step 2: Install sshpass
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      # Step 3: Test SSH connection (to verify secrets)
+      - name: Test SSH Connection
+        env:
+          SERVER_IP: ${{ secrets.VPC_SERVER_IP }}
+          USERNAME: ${{ secrets.VPC_USER }}
+          PASSWORD: ${{ secrets.VPC_PASSWORD }}
+        run: |
+          echo "Testing SSH connection to ${USERNAME}@${SERVER_IP}..."
+          sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME@$SERVER_IP" "echo '✅ Connected successfully to server!'"
+
+      # Step 4: Deploy the app (only after test passes)
+      - name: Deploy Application to VPC Server
+        env:
+          SERVER_IP: ${{ secrets.VPC_SERVER_IP }}
+          USERNAME: ${{ secrets.VPC_USER }}
+          PASSWORD: ${{ secrets.VPC_PASSWORD }}
+        run: |
+          echo "Connecting to ${USERNAME}@${SERVER_IP} for deployment..."
+          sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME@$SERVER_IP" "
+            if [ ! -d /root/auth-service ]; then
+              echo 'Cloning repository for the first time...'
+              cd /root && git clone https://github.com/emptfloortech/auth-service.git
+            fi
+
+            cd /root/auth-service &&
+            git pull origin main &&
+            ./mvnw clean package -DskipTests &&
+            pkill -f 'java -jar' || true &&
+            nohup java -jar target/*.jar > app.log 2>&1 &
+            echo '✅ Deployment completed successfully!'
+          "
+
