@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
-@Entity('resale_properties')
-export class resalePropertyEntity {
+@Entity('rental_properties')
+export class rentalPropertyEntity {
   @PrimaryGeneratedColumn()
   id: number;
   
@@ -69,5 +69,16 @@ export class resalePropertyEntity {
   @Column({ type: 'jsonb', nullable: false })
   brokerageOptions: any;
 
+  @Column({ type: 'jsonb', nullable: false })
+  preferredTenantOptions: any;
+
+  @Column({ type: 'jsonb', nullable: false })
+  foodPreferenceOptions: any;
+
+  @Column({ type: 'jsonb', nullable: false })
+  securityDepositOptions: any;
+
+  @Column({ type: 'jsonb', nullable: false })
+  lookingForOptions: any;
 
 }
