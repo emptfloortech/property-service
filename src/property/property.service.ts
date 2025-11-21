@@ -24,7 +24,7 @@ export class PropertyService {
      * Returns an array of objects (column -> value).
      */
     async getRentals(): Promise<any[]> {
-      const sql = `SELECT * FROM public.rental ORDER BY id ASC`;
+      const sql = `SELECT * FROM public.rental_properties ORDER BY id ASC`;
       const rows = await this.databaseService.query(sql);
       return Array.isArray(rows) ? rows : [];
     }
@@ -34,7 +34,7 @@ export class PropertyService {
      * Returns an array of objects (column -> value).
      */
     async getResales(): Promise<any[]> {
-      const sql = `SELECT * FROM public.resale ORDER BY id ASC`;
+      const sql = `SELECT * FROM public.resale_properties ORDER BY id ASC`;
       const rows = await this.databaseService.query(sql);
       return Array.isArray(rows) ? rows : [];
     }
