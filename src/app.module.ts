@@ -8,6 +8,8 @@ import { CityEntity } from './domain/city.entity';
 import { LocalityEntity } from './domain/locality.entity';
 import { resalePropertyEntity } from './domain/resale.property.entity';
 import { rentalPropertyEntity } from './domain/rental.entity';
+import { ProjectEntity } from './domain/project.entity';
+import { PropertyListingEntity } from './domain/propertylisting.entity';
 import { PropertyController } from './property/property.controller';
 
 
@@ -18,16 +20,23 @@ import { PropertyController } from './property/property.controller';
     }),
     TypeOrmModule.forRoot({
       type: 'postgres',
+      // Prefer DATABASE_URL when available (e.g. Neon). Fall back to individual vars.
+      url: process.env.DATABASE_URL || undefined,
       host: process.env.DB_HOST || 'localhost',
-      port: parseInt(process.env.DB_PORT) || 5432,
+      port: process.env.DB_PORT ? parseInt(process.env.DB_PORT) : 5432,
       username: process.env.DB_USER || 'root',
       password: process.env.DB_PASSWORD || 'root',
       database: process.env.DB_NAME || 'emptyfloor',
-  entities: [CityEntity, LocalityEntity, resalePropertyEntity, rentalPropertyEntity],
+      // If using a managed DB (Neon etc.) the connection string may require SSL.
+      // `extra.ssl` with `rejectUnauthorized:false` relaxes certificate checks for managed providers.
+      extra: process.env.DATABASE_URL
+        ? { ssl: { rejectUnauthorized: false } }
+        : undefined,
+  entities: [CityEntity, LocalityEntity, resalePropertyEntity, rentalPropertyEntity,ProjectEntity, PropertyListingEntity],
       synchronize: true, // Auto-creates/updates tables (disable in production!)
       logging: process.env.DB_LOGGING === 'true',
     }),
-  TypeOrmModule.forFeature([CityEntity, LocalityEntity, resalePropertyEntity, rentalPropertyEntity]),
+  TypeOrmModule.forFeature([CityEntity, LocalityEntity, resalePropertyEntity, rentalPropertyEntity,ProjectEntity, PropertyListingEntity]),
     JwtModule.register({
       global: true, // optional, makes JwtService available globally
       secret: process.env.JWT_SECRET || 'super-secret-key',
@@ -35,7 +44,7 @@ import { PropertyController } from './property/property.controller';
     }),
     PropertyModule,
   ],
-  controllers: [],
+  controllers: [PropertyController],
   providers: [DatabaseService],
 })
 export class AppModule {}

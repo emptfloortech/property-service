@@ -1,4 +1,4 @@
-import { Controller, Get, Query } from '@nestjs/common';
+import { Controller, Get, Query, Post, Body } from '@nestjs/common';
 import { PropertyService } from './property.service';
 
 @Controller()
@@ -21,11 +21,20 @@ export class PropertyController {
     return this.service.getRentals();
   }
 
+  @Post('rental')
+  async createRental(@Body() payload: any): Promise<any> {
+    return this.service.createRental(payload);
+  }
+
   @Get('resales')
   async getResales(): Promise<any[]> {
     return this.service.getResales();
   }
 
+  @Post('resale')
+  async createResale(@Body() payload: any): Promise<any> {
+    return this.service.createRental(payload);
+  }
   
 
 }
