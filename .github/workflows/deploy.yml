@@ -37,12 +37,12 @@ jobs:
         run: |
           echo "Connecting to ${USERNAME}@${SERVER_IP} for deployment..."
           sshpass -p "$PASSWORD" ssh -o StrictHostKeyChecking=no "$USERNAME@$SERVER_IP" "
-            if [ ! -d /root/auth-service ]; then
+            if [ ! -d /root/property-service ]; then
               echo 'Cloning repository for the first time...'
-              cd /root && git clone https://github.com/emptfloortech/auth-service.git
+              cd /root && git clone https://github.com/emptfloortech/property-service.git
             fi
 
-            cd /root/auth-service &&
+            cd /root/property-service &&
             git pull origin main &&
             ./mvnw clean package -DskipTests &&
             pkill -f 'java -jar' || true &&
